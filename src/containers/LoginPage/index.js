@@ -5,6 +5,7 @@ import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
 import { routes } from '../Router'
+import Imagem from '../../imgs/logoWide.png'
 
 
 const Body = styled.div `
@@ -13,19 +14,22 @@ const Body = styled.div `
   background-color: #DAE0E6;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  padding-top: 100px;
 `
 const ContainerLogin = styled.div `
   display: flex;
   justify-content: center;
   flex-direction: column;
-  min-width: 300px;
-  width: 40vw;
-  border: 1px solid black;
+  min-width: 400px;
+  width: fit-content;
+  border: 2px solid #878a8c;
   height: fit-content;
   padding: 20px;
   box-sizing: border-box;
+  margin-bottom: 30px;
+  background-color: white;
+  border-radius: 5px;
 `
 const Form = styled.form `
   display: flex;
@@ -34,13 +38,21 @@ const Form = styled.form `
   align-items: center;
 
 `
+const ImgLogo = styled.img `
+  width: 400px;
+  border-radius: 5px;
+  margin-bottom: 50px;
+`
 
 
 class LoginPage extends Component {
   render() {
+    const { goToListPosts } = this.props
     const { goToFormRegister } = this.props
     return (
       <Body>
+        <ImgLogo src={Imagem}/>
+
         <ContainerLogin>
         <Form>
           <TextField
@@ -67,7 +79,8 @@ class LoginPage extends Component {
           <Button 
           variant="contained"
           color="secondary"
-          type="submit">Entrar</Button>
+          type="submit"
+          onClick={goToListPosts}>Entrar</Button>
           <br/>
           <Button 
           variant="contained"
@@ -85,6 +98,7 @@ class LoginPage extends Component {
 
 const mapDispatchToProps = dispatch => ({ 
   goToFormRegister: () => dispatch(push(routes.register)),
+  goToListPosts: () => dispatch(push(routes.listPosts))
 })
 
 export default connect (
