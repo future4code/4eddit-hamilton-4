@@ -5,7 +5,8 @@ import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
 import { routes } from '../Router'
-
+import Header from '../../components/Header'
+import { createUser } from '../../actions/user'
 
 const Body = styled.div `
   width: 100vw;
@@ -13,19 +14,21 @@ const Body = styled.div `
   background-color: #DAE0E6;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 `
 const ContainerLogin = styled.div `
   display: flex;
   justify-content: center;
   flex-direction: column;
-  min-width: 300px;
-  width: 40vw;
-  border: 1px solid black;
+  min-width: 500px;
+  width: fit-content;
+  border: 2px solid #878a8c;
   height: fit-content;
   padding: 20px;
   box-sizing: border-box;
+  margin-bottom: 30px;
+  background-color: white;
+  border-radius: 5px;
 `
 const Form = styled.form `
   display: flex;
@@ -35,44 +38,61 @@ const Form = styled.form `
 
 `
 
-
-
 class FormRegister extends Component {
+  constructor(props){
+    super(props)
+    this.state = {
+      form: {}
+    }
+  }
+
+  handleInputChange = (event) => {
+    const {name, value} = event.target;
+    this.setState ({
+      form: {...this.state.form, [name]: value}
+    })
+  }
+  handleSubmmit = (event) => {
+    event.preventDefault();
+    console.log(this.state.form)
+    this.props.createUser(this.state.form)
+  }
+
   render() {
-    const { goToListPosts } = this.props
+    const {username, email, password} = this.state;
+
     return (
       <Body>
+        <Header/>
         <ContainerLogin>
-          <Form>
+          <Form onSubmit={this.handleSubmmit}>
         <TextField
+        onChange={this.handleInputChange}
           name="username"
           required
           type="text"
           inputProps={{pattern: "[A-Za-z-_]{3,}", 
           title: "O nome deve conter no mínimo 3 letras"}}    
           label="Nome de usuário"
-          // onChange={this.handleInputChange}
-          // value={this.state.form.name || "" 
+          value={username}
           />
           <TextField
+          onChange={this.handleInputChange}
           name="email"
           required
           type="email"
           label="E-mail"
-          // onChange={this.handleInputChange}
-          // value={this.state.form.name || "" 
+          value={email}
           />
           <TextField
+          onChange={this.handleInputChange}
           name="password"
           required
           type="password"
           label="Senha"            
-          // onChange={this.handleInputChange}
-          // value={this.state.form.name || "" 
+          value={password}
           />
-          <Button onClick={goToListPosts} type="submit">Cadastrar</Button>
-
-        
+          <Button type="submit">Cadastrar</Button>        
         </Form>
 
         </ContainerLogin>
@@ -82,7 +102,7 @@ class FormRegister extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({ 
-  goToListPosts: () => dispatch(push(routes.listPosts)),
+  createUser: (body) => dispatch(createUser(body))
 })
 
 export default connect (
