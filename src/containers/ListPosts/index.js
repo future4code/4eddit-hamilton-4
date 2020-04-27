@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
-import { push } from "connected-react-router";
+import { push, replace } from "connected-react-router";
 import { routes } from '../Router'
 import { MdThumbDown, MdThumbUp } from 'react-icons/md';
 import { FaRegCommentDots, FaShare} from 'react-icons/fa';
@@ -103,14 +103,25 @@ const ImgLogo = styled.img `
 `
 ///////////////////////////////Header
 
+
+
 class ListPosts extends Component {
-  render() {
+
+
+handleLogout = () => {
+  localStorage.clear()
+  this.props.goToLoginScreen()
+}
+
+
+  render() { 
+    const isLogged = localStorage.getItem("token") !== null
     const { goToPostDetails } = this.props
     return (
       <Body>
         <HeaderComp>
           <ImgLogo src={Imagem}/>
-          <Button variant="contained" color="primary">LogOut</Button>
+         {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
         </HeaderComp>
         <PostCard>
           <TextField
@@ -180,6 +191,8 @@ class ListPosts extends Component {
 
 const mapDispatchToProps = dispatch => ({ 
   goToPostDetails: () => dispatch(push(routes.postDetails)),
+  goToLoginScreen: () => dispatch(replace(routes.root))
+
 })
 
 export default connect (
