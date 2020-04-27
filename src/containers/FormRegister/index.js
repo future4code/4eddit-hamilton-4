@@ -36,24 +36,33 @@ const Form = styled.form `
 `
 
 
-class LoginPage extends Component {
+
+class FormRegister extends Component {
   render() {
-    const { goToFormRegister } = this.props
+    const { goToListPosts } = this.props
     return (
       <Body>
         <ContainerLogin>
-        <Form>
-          <TextField
-          width= "50%"
-          name="email"
+          <Form>
+        <TextField
+          name="username"
           required
-          type="email"
-          label="Username"
+          type="text"
+          inputProps={{pattern: "[A-Za-z-_]{3,}", 
+          title: "O nome deve conter no mínimo 3 letras"}}    
+          label="Nome de usuário"
           // onChange={this.handleInputChange}
           // value={this.state.form.name || "" 
           />
           <TextField
-          width= "50%"
+          name="email"
+          required
+          type="email"
+          label="E-mail"
+          // onChange={this.handleInputChange}
+          // value={this.state.form.name || "" 
+          />
+          <TextField
           name="password"
           required
           type="password"
@@ -61,21 +70,10 @@ class LoginPage extends Component {
           // onChange={this.handleInputChange}
           // value={this.state.form.name || "" 
           />
-          <br/>
+          <Button onClick={goToListPosts} type="submit">Cadastrar</Button>
+
         
-          <br/>
-          <Button 
-          variant="contained"
-          color="secondary"
-          type="submit">Entrar</Button>
-          <br/>
-          <Button 
-          variant="contained"
-          color="primary"
-          onClick={goToFormRegister}>Cadastrar</Button>
         </Form>
-          
-       
 
         </ContainerLogin>
       </Body>
@@ -84,11 +82,11 @@ class LoginPage extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({ 
-  goToFormRegister: () => dispatch(push(routes.register)),
+  goToListPosts: () => dispatch(push(routes.listPosts)),
 })
 
 export default connect (
   null, 
   mapDispatchToProps
-)(LoginPage);
+)(FormRegister);
 
