@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { push } from "connected-react-router";
 import { routes } from '../Router'
 import Imagem from '../../imgs/logoWide.png'
+import { loginUser } from '../../actions/user'
 
 
 const Body = styled.div `
@@ -46,23 +47,49 @@ const ImgLogo = styled.img `
 
 
 class LoginPage extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      email: '',
+      password: ''
+    }
+  }
+
+handleLogin = (event) => {
+  event.preventDefault()
+  this.props.loginUser(this.state.email, this.state.password)
+}
+
+handleInputChange = (event) => {
+  const {name, value} = event.target;
+  this.setState ({
+   [name] : value
+  })
+}
+
+handleFieldChange = (event) => {
+  this.setState({
+    [event.target.name]: event.target.value
+  })
+}
+
   render() {
-    const { goToListPosts } = this.props
+    const { email, password } = this.state
     const { goToFormRegister } = this.props
     return (
       <Body>
         <ImgLogo src={Imagem}/>
 
         <ContainerLogin>
-        <Form>
+        <Form onSubmit={this.handleLogin}>
           <TextField
           width= "50%"
           name="email"
           required
           type="email"
-          label="Username"
-          // onChange={this.handleInputChange}
-          // value={this.state.form.name || "" 
+          label="Email"
+          onChange={this.handleFieldChange}
+          value={email} 
           />
           <TextField
           width= "50%"
@@ -70,8 +97,8 @@ class LoginPage extends Component {
           required
           type="password"
           label="Senha"            
-          // onChange={this.handleInputChange}
-          // value={this.state.form.name || "" 
+          onChange={this.handleFieldChange}
+          value={password} 
           />
           <br/>
         
@@ -80,7 +107,7 @@ class LoginPage extends Component {
           variant="contained"
           color="secondary"
           type="submit"
-          onClick={goToListPosts}>Entrar</Button>
+          >Entrar</Button>
           <br/>
           <Button 
           variant="contained"
@@ -98,7 +125,8 @@ class LoginPage extends Component {
 
 const mapDispatchToProps = dispatch => ({ 
   goToFormRegister: () => dispatch(push(routes.register)),
-  goToListPosts: () => dispatch(push(routes.listPosts))
+  loginUser: (email, password) => dispatch(loginUser(email, password)),
+  
 })
 
 export default connect (

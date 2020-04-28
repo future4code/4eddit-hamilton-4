@@ -3,23 +3,39 @@ import styled from 'styled-components'
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
-import { push } from "connected-react-router";
+import { push, replace } from "connected-react-router";
 import { routes } from '../Router'
 import { MdThumbDown, MdThumbUp } from 'react-icons/md';
 import { FaRegCommentDots, FaShare} from 'react-icons/fa';
 import { BsBookmarkFill, BsThreeDots } from 'react-icons/bs';
+import Imagem from '../../imgs/logoHeader.png'
 
 
 
-
+///////////////////////////////Header
+const HeaderComp = styled.div `
+  width: 100%;
+  height: 100px;
+  background-color:  #ED7F61;
+  display: flex;
+  align-items: center;
+  padding-left: 50px;
+  padding-right: 50px;
+  margin-bottom: 50px;
+  justify-content: space-between;
+`
+const ImgLogo = styled.img `
+  width: 120px;
+`
+///////////////////////////////Header
 
 const Body = styled.div `
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background-color: #DAE0E6;
   display: flex;
   flex-direction: column;
-  padding-top: 100px;
+  
   align-items: center;
 `
 //////////////////////////////post card and other components
@@ -84,17 +100,36 @@ const IconButton = styled.button `
 `
 //////////////////////post footer components
 
-
-
 //////////////////////////////post card components
 
 
 
 class PostDetails extends Component {
+
+  componentDidMount() {
+    const token = localStorage.getItem('token')
+    if (token === null)
+    this.props.goToLoginScreen()
+  }
+  handleLogout = () => {
+    localStorage.clear()
+    this.props.goToLoginScreen()
+  }
+  
+
   render() {
     const { goToListPosts } = this.props
+    const isLogged = localStorage.getItem("token") !== null
     return (
       <Body>
+
+      <HeaderComp>
+          <ImgLogo src={Imagem}/>
+          <TextField
+          label="Search"
+          />
+         {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
+      </HeaderComp>
 
     <PostCard>
       <PostHeader>
@@ -185,6 +220,7 @@ class PostDetails extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({ 
+  goToLoginScreen: () => dispatch(replace(routes.root))
   //goToListPosts: () => dispatch(push(routes.listPosts)),
 })
 
