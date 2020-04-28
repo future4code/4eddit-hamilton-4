@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import styled from 'styled-components'
+import styled, {keyframes} from 'styled-components'
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
@@ -10,62 +10,107 @@ import { MdThumbDown, MdThumbUp } from 'react-icons/md';
 import { FaRegCommentDots, FaShare } from 'react-icons/fa';
 import { BsBookmarkFill, BsThreeDots } from 'react-icons/bs';
 import { GoSearch } from 'react-icons/go'
-
 import Imagem from '../../imgs/logoHeader.png'
 import { getPosts, createPost, votePost } from '../../actions/posts'
+import { withStyles } from '@material-ui/core/styles';
+
+
+const colors = keyframes` {
+  0% {
+      background-position: 0% 50%;
+  }
+
+  50%{
+      background-position: 100% 50%;
+  }
+
+  100%{
+      background-position: 0% 50%;
+  }
+}
+`
+
+const StyledButton = withStyles({
+  root: {
+    // background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+    background: '#ed7f61',
+    borderRadius: 3,
+    border: 0,
+    color: 'white',
+    height: 48,
+    padding: '0 30px',
+  },
+  label: {
+    textTransform: 'capitalize',
+  },
+})(Button);
 
 
 const Body = styled.div`
   width: 100%;
   height: 100%;
-  background-color: #DAE0E6;
+  background: linear-gradient(90deg ,#c0c0aa ,#1cefff ) ;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-size: 150% 150%;
+  animation: ${colors} 13s ease infinite;
+ 
 `
 //////////////////////////////post card components
 const PostCard = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
   flex-direction: column;
-  min-width: 500px;
-  width: 40vw;
-  border: 2px solid #878a8c;
+  min-width: 400px;
+  width: 30vw;
   height: fit-content;
- /* padding: 20px; */
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
   box-sizing: border-box;
   margin-bottom: 30px;
   background-color: white;
   border-radius: 5px;
 `
+const CreatePost = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-width: 400px;
+  width: 30vw;
+  height: fit-content;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
+  box-sizing: border-box;
+  margin-bottom: 30px;
+  background-color: white;
+  border-radius: 5px;
+  padding: 30px;
+`
 
 //////////////////////post header components
 const PostHeader = styled.div`
-  border-bottom: 2px solid #878a8c;
+  border-bottom: 2px solid #ed7f61;
   padding: 0px 10px 0px 10px;
   margin-bottom: 20px;
 `
-const PostTittle = styled.div`
-  border-bottom: 2px solid #878a8c;
-  padding: 0px 10px 0px 10px;
-  margin-bottom: 20px;
-`
-//////////////////////post header components
 
 //////////////////////post body components
 const PostContent = styled.div`
   height: fit-content;
-  width: 100%;
-  border: 2px solid red;
+  width: 60%;
   padding:20px;
+  margin: auto;
+  text-align: center;
+
+  
 `
-//////////////////////post body components
 
 //////////////////////post footer components
 const PostFooter = styled.div`
   display: flex;
   justify-content: space-between;
-  border-top: 2px solid #878a8c;
+  border-top: 2px solid  #ed7f61;
   padding: 6px 10px 3px 10px;
   margin-top: 20px;
 `
@@ -77,12 +122,7 @@ const PostLikeIcons = styled.div`
 const Icons = styled.h2`
   margin: 0px 10px 0px 10px;
   color: #878a8c;
-  :active {
-    color: red;
-  }
-  :target {
-    color: red;
-  }
+
 `
 //////Icons Button
 const IconButton = styled.button`
@@ -94,11 +134,6 @@ const IconButton = styled.button`
   height: fit-content;
   outline: none;
 `
-//////////////////////post footer components
-
-
-
-//////////////////////////////post card components
 
 ///////////////////////////////Header
 const HeaderComp = styled.div`
@@ -115,7 +150,6 @@ const HeaderComp = styled.div`
 const ImgLogo = styled.img`
   width: 120px;
 `
-///////////////////////////////Header
 
 ////////////////////////////Search Box
 const FatherDiv = styled.div`
@@ -126,20 +160,20 @@ const SearchIconDiv = styled.div`
   margin-top: 25px;
 `
 
-////////////////////////////Search Box
-
-
+const H5 = styled.h5`
+color: #636e72;
+`
 
 class ListPosts extends Component {
-constructor(props) {
-  super(props) 
-  this.state = {
-    postValue: {
-      text: "",
-      title: ""
+  constructor(props) {
+    super(props)
+    this.state = {
+      postValue: {
+        text: "",
+        title: ""
+      }
     }
   }
-}
 
   componentDidMount() {
     const token = localStorage.getItem('token')
@@ -155,23 +189,23 @@ constructor(props) {
 
   handleInputChange = (event) => {
     const { name, value } = event.target
-    this.setState ({ 
-      postValue: {...this.state.postValue, [name]: value  }
+    this.setState({
+      postValue: { ...this.state.postValue, [name]: value }
     })
   }
   handleCreatePost = (event) => {
     event.preventDefault()
     this.props.createPost(this.state.postValue)
-    this.setState ({
-      postValue: {text: "", title: ''}    
+    this.setState({
+      postValue: { text: "", title: '' }
     })
-    console.log(this.state.postValue)
+    // console.log(this.state.postValue)
   }
 
   handleVote = (direction, id, userVoteDirection) => {
-    if (direction === userVoteDirection){
+    if (direction === userVoteDirection) {
       this.props.votePost(0, id)
-    }else {
+    } else {
       this.props.votePost(direction, id)
     }
   }
@@ -181,17 +215,18 @@ constructor(props) {
   render() {
     const isLogged = localStorage.getItem("token") !== null
     const { goToPostDetails } = this.props
-    console.log(this.props.posts)
+    // console.log(this.props.posts)
     return (
       <Body>
+        {/* Header do site */}
         <HeaderComp>
           <ImgLogo src={Imagem} />
 
           <FatherDiv><TextField
-            style = {{width: 500}} 
+            style={{ width: 500 }}
             label="Search"
-            
-            />
+
+          />
             <SearchIconDiv>
               <h2><GoSearch /></h2>
             </SearchIconDiv>
@@ -200,34 +235,39 @@ constructor(props) {
           {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
         </HeaderComp>
 
-      
-        <PostCard>
+        {/* Criação de um post */}
+        <CreatePost>
           <TextField
+            style={{ width: 300 }}
             name="title"
             type="text"
             required
             label="Dê um título para seu post"
             onChange={this.handleInputChange}
-            value={this.state.postValue.title} 
+            value={this.state.postValue.title}
           />
           <TextField
+            style={{ width: 300 }}
             name="text"
             type="text"
             required
             label="Conte-nos no que está pensando..."
             onChange={this.handleInputChange}
-            value={this.state.postValue.text} 
+            value={this.state.postValue.text}
           />
-          <Button onClick={this.handleCreatePost} >Postar!</Button>
-        </PostCard>
+          <br />
+          <StyledButton variant="contained" color="secondary" onClick={this.handleCreatePost} >POSTAR</StyledButton>
+        </CreatePost>
 
-
+        {/* Lista de post */}
         {this.props.posts &&
           this.props.posts.map((post) => {
             return (
+
               <PostCard>
+
                 <PostHeader>
-                  <p>Usuário: {post.username}</p>
+                  <H5>Posted by: <u>{post.username} 3 days ago</u></H5>
                 </PostHeader>
 
                 <PostContent>
@@ -237,35 +277,44 @@ constructor(props) {
 
                 <PostFooter>
 
+                  {/* Icons like e dislike */}
                   <PostLikeIcons>
-                    <IconButton onClick={()=> this.handleVote(1, post.id, post.userVoteDirection)} >
+                    <IconButton onClick={() => this.handleVote(1, post.id, post.userVoteDirection)} >
                       <Icons>
-                        <MdThumbUp color={post.userVoteDirection === 1 ? "red" : "#878a8c"}/>
+                        <MdThumbUp color={post.userVoteDirection === 1 ? "red" : "#878a8c"} />
                       </Icons>
                     </IconButton>
                     {post.votesCount}
-                    <IconButton onClick={()=> this.handleVote(-1, post.id, post.userVoteDirection)} >
+                    <IconButton onClick={() => this.handleVote(-1, post.id, post.userVoteDirection)} >
                       <Icons>
-                        <MdThumbDown color={post.userVoteDirection === -1 ? "blue" : "#878a8c"}/>
+                        <MdThumbDown color={post.userVoteDirection === -1 ? "blue" : "#878a8c"} />
                       </Icons>
                     </IconButton>
                   </PostLikeIcons>
 
+                  {/* Seção comentário */}
                   <IconButton onClick={goToPostDetails}>
                     <Icons>
                       <FaRegCommentDots />
                     </Icons>
                   </IconButton>
+                  0
+
+                  {/* Icon compartilhar */}
                   <IconButton>
                     <Icons>
                       <FaShare />
                     </Icons>
                   </IconButton>
+
+                  {/* Icon salvar */}
                   <IconButton>
                     <Icons>
                       <BsBookmarkFill />
                     </Icons>
                   </IconButton>
+
+                  {/* Icon mais opções */}
                   <IconButton>
                     <Icons>
                       <BsThreeDots />
@@ -293,7 +342,7 @@ const mapDispatchToProps = dispatch => ({
   goToLoginScreen: () => dispatch(replace(routes.root)),
   getPosts: () => dispatch(getPosts()),
   createPost: (body) => dispatch(createPost(body)),
-  votePost: (direction, id ) => dispatch(votePost(direction, id))
+  votePost: (direction, id) => dispatch(votePost(direction, id))
 
 })
 
