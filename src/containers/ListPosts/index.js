@@ -5,21 +5,27 @@ import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
 import { push, replace } from "connected-react-router";
 import { routes } from '../Router'
+//react icons início
 import { MdThumbDown, MdThumbUp } from 'react-icons/md';
-import { FaRegCommentDots, FaShare} from 'react-icons/fa';
+import { FaRegCommentDots, FaShare } from 'react-icons/fa';
 import { BsBookmarkFill, BsThreeDots } from 'react-icons/bs';
-import Imagem from '../../imgs/logoHeader.png'
+import { GoSearch } from 'react-icons/go'
+import { sizing } from '@material-ui/system';
 
-const Body = styled.div `
-  width: 100vw;
-  height: 100vh;
+import Imagem from '../../imgs/logoHeader.png'
+import { getPosts } from '../../actions/posts'
+
+
+const Body = styled.div`
+  width: 100%;
+  height: 100%;
   background-color: #DAE0E6;
   display: flex;
   flex-direction: column;
   align-items: center;
 `
 //////////////////////////////post card components
-const PostCard = styled.div `
+const PostCard = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -35,7 +41,7 @@ const PostCard = styled.div `
 `
 
 //////////////////////post header components
-const PostHeader = styled.div `
+const PostHeader = styled.div`
   border-bottom: 2px solid #878a8c;
   padding: 0px 10px 0px 10px;
   margin-bottom: 20px;
@@ -43,7 +49,7 @@ const PostHeader = styled.div `
 //////////////////////post header components
 
 //////////////////////post body components
-const PostContent = styled.div `
+const PostContent = styled.div`
   height: fit-content;
   width: 100%;
   border: 2px solid red;
@@ -52,7 +58,7 @@ const PostContent = styled.div `
 //////////////////////post body components
 
 //////////////////////post footer components
-const PostFooter = styled.div `
+const PostFooter = styled.div`
   display: flex;
   justify-content: space-between;
   border-top: 2px solid #878a8c;
@@ -60,16 +66,16 @@ const PostFooter = styled.div `
   margin-top: 20px;
 `
 //////Thumbs Icons Div
-const PostLikeIcons = styled.div `
+const PostLikeIcons = styled.div`
   display: flex;
   
 `
-const Icons = styled.h2 `
+const Icons = styled.h2`
   margin: 0px 10px 0px 10px;
   color: #878a8c;
 `
 //////Icons Button
-const IconButton = styled.button `
+const IconButton = styled.button`
   background: transparent;
   border: none;
   color: inherit;
@@ -85,10 +91,8 @@ const IconButton = styled.button `
 //////////////////////////////post card components
 
 ///////////////////////////////Header
-
-
-const HeaderComp = styled.div `
-  width: 100vw;
+const HeaderComp = styled.div`
+  width: 100%;
   height: 100px;
   background-color:  #ED7F61;
   display: flex;
@@ -98,105 +102,142 @@ const HeaderComp = styled.div `
   margin-bottom: 50px;
   justify-content: space-between;
 `
-const ImgLogo = styled.img `
+const ImgLogo = styled.img`
   width: 120px;
 `
 ///////////////////////////////Header
+
+////////////////////////////Search Box
+const FatherDiv = styled.div`
+  display: flex;
+  align-items: center;
+`
+const SearchIconDiv = styled.div`
+  margin-top: 25px;
+`
+
+////////////////////////////Search Box
 
 
 
 class ListPosts extends Component {
 
 
-handleLogout = () => {
-  localStorage.clear()
-  this.props.goToLoginScreen()
-}
+  componentDidMount() {
+    const token = localStorage.getItem('token')
+    if (token === null)
+      this.props.goToLoginScreen()
+    this.props.getPosts()
+  }
+
+  handleLogout = () => {
+    localStorage.clear()
+    this.props.goToLoginScreen()
+  }
 
 
-  render() { 
+  render() {
     const isLogged = localStorage.getItem("token") !== null
     const { goToPostDetails } = this.props
     return (
       <Body>
         <HeaderComp>
-          <ImgLogo src={Imagem}/>
-         {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
+          <ImgLogo src={Imagem} />
+
+          <FatherDiv><TextField
+            style = {{width: 500}} 
+            label="Search"
+            variant="outlined"
+            />
+            <SearchIconDiv>
+              <h2><GoSearch /></h2>
+            </SearchIconDiv>
+          </FatherDiv>
+
+          {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
         </HeaderComp>
         <PostCard>
           <TextField
-          name="username"
-          type="text"
-          label="Conte-nos no que está pensando..."
+            name="username"
+            type="text"
+            label="Conte-nos no que está pensando..."
           // onChange={this.handleInputChange}
           // value={this.state.form.name || "" 
           />
           <Button /* aqui vai função pra enviar o post pra api */ type="submit">Postar!</Button>
-        </PostCard>   
+        </PostCard>
 
+        {this.props.posts &&
+          this.props.posts.map((posts) => {
+            return (
+              <PostCard>
+                <PostHeader>
+                  <p>Usuário: {posts.username}</p>
+                </PostHeader>
 
-    <PostCard>
-        <PostHeader>
-          <p>Nome do Usuário</p>
-        </PostHeader>
-          
-          <PostContent>
-            conteúdo do post
-    
-            
-            
-          </PostContent>
+                <PostContent>
+                  <p>{posts.text}</p>
+                </PostContent>
 
-      <PostFooter>
-        <PostLikeIcons>
-          <IconButton>
-              <Icons>
-                <MdThumbUp/>
-              </Icons>
-          </IconButton>
-          <IconButton>
-              <Icons>
-                <MdThumbDown/>
-              </Icons>
-          </IconButton>
-        </PostLikeIcons>
+                <PostFooter>
+                  <PostLikeIcons>
+                    <IconButton>
+                      <Icons>
+                        <MdThumbUp />
+                      </Icons>
+                    </IconButton>
+                    <IconButton>
+                      <Icons>
+                        <MdThumbDown />
+                      </Icons>
+                    </IconButton>
+                  </PostLikeIcons>
 
-          <IconButton onClick={goToPostDetails}>
-            <Icons>
-              <FaRegCommentDots/>
-            </Icons>            
-          </IconButton>
-          <IconButton>
-            <Icons>
-              <FaShare/>
-            </Icons>     
-          </IconButton>
-          <IconButton>
-            <Icons>
-              <BsBookmarkFill/>
-            </Icons>
-          </IconButton>
-          <IconButton> 
-            <Icons>
-              <BsThreeDots/>
-            </Icons>
-          </IconButton>
+                  <IconButton onClick={goToPostDetails}>
+                    <Icons>
+                      <FaRegCommentDots />
+                    </Icons>
+                  </IconButton>
+                  <IconButton>
+                    <Icons>
+                      <FaShare />
+                    </Icons>
+                  </IconButton>
+                  <IconButton>
+                    <Icons>
+                      <BsBookmarkFill />
+                    </Icons>
+                  </IconButton>
+                  <IconButton>
+                    <Icons>
+                      <BsThreeDots />
+                    </Icons>
+                  </IconButton>
 
-      </PostFooter>
-    </PostCard>
+                </PostFooter>
+              </PostCard>
+            )
+          })
+        }
+
       </Body>
     );
   }
 }
 
-const mapDispatchToProps = dispatch => ({ 
-  goToPostDetails: () => dispatch(push(routes.postDetails)),
-  goToLoginScreen: () => dispatch(replace(routes.root))
+const mapStateToProps = (state) => ({
+  posts: state.posts.posts
 
 })
 
-export default connect (
-  null, 
+const mapDispatchToProps = dispatch => ({
+  goToPostDetails: () => dispatch(push(routes.postDetails)),
+  goToLoginScreen: () => dispatch(replace(routes.root)),
+  getPosts: () => dispatch(getPosts())
+})
+
+export default connect(
+  mapStateToProps,
   mapDispatchToProps
 )(ListPosts);
 
