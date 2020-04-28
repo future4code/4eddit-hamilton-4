@@ -10,10 +10,9 @@ import { MdThumbDown, MdThumbUp } from 'react-icons/md';
 import { FaRegCommentDots, FaShare } from 'react-icons/fa';
 import { BsBookmarkFill, BsThreeDots } from 'react-icons/bs';
 import { GoSearch } from 'react-icons/go'
-import { sizing } from '@material-ui/system';
 
 import Imagem from '../../imgs/logoHeader.png'
-import { getPosts } from '../../actions/posts'
+import { getPosts, createPost, votePost } from '../../actions/posts'
 
 
 const Body = styled.div`
@@ -46,6 +45,11 @@ const PostHeader = styled.div`
   padding: 0px 10px 0px 10px;
   margin-bottom: 20px;
 `
+const PostTittle = styled.div`
+  border-bottom: 2px solid #878a8c;
+  padding: 0px 10px 0px 10px;
+  margin-bottom: 20px;
+`
 //////////////////////post header components
 
 //////////////////////post body components
@@ -73,6 +77,12 @@ const PostLikeIcons = styled.div`
 const Icons = styled.h2`
   margin: 0px 10px 0px 10px;
   color: #878a8c;
+  :active {
+    color: red;
+  }
+  :target {
+    color: red;
+  }
 `
 //////Icons Button
 const IconButton = styled.button`
@@ -121,7 +131,15 @@ const SearchIconDiv = styled.div`
 
 
 class ListPosts extends Component {
-
+constructor(props) {
+  super(props) 
+  this.state = {
+    postValue: {
+      text: "",
+      title: ""
+    }
+  }
+}
 
   componentDidMount() {
     const token = localStorage.getItem('token')
@@ -135,10 +153,35 @@ class ListPosts extends Component {
     this.props.goToLoginScreen()
   }
 
+  handleInputChange = (event) => {
+    const { name, value } = event.target
+    this.setState ({ 
+      postValue: {...this.state.postValue, [name]: value  }
+    })
+  }
+  handleCreatePost = (event) => {
+    event.preventDefault()
+    this.props.createPost(this.state.postValue)
+    this.setState ({
+      postValue: {text: "", title: ''}    
+    })
+    console.log(this.state.postValue)
+  }
+
+  handleVote = (direction, id, userVoteDirection) => {
+    if (direction === userVoteDirection){
+      this.props.votePost(0, id)
+    }else {
+      this.props.votePost(direction, id)
+    }
+  }
+
+
 
   render() {
     const isLogged = localStorage.getItem("token") !== null
     const { goToPostDetails } = this.props
+    console.log(this.props.posts)
     return (
       <Body>
         <HeaderComp>
@@ -147,7 +190,7 @@ class ListPosts extends Component {
           <FatherDiv><TextField
             style = {{width: 500}} 
             label="Search"
-            variant="outlined"
+            
             />
             <SearchIconDiv>
               <h2><GoSearch /></h2>
@@ -156,39 +199,54 @@ class ListPosts extends Component {
 
           {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
         </HeaderComp>
+
+      
         <PostCard>
           <TextField
-            name="username"
+            name="title"
             type="text"
-            label="Conte-nos no que está pensando..."
-          // onChange={this.handleInputChange}
-          // value={this.state.form.name || "" 
+            required
+            label="Dê um título para seu post"
+            onChange={this.handleInputChange}
+            value={this.state.postValue.title} 
           />
-          <Button /* aqui vai função pra enviar o post pra api */ type="submit">Postar!</Button>
+          <TextField
+            name="text"
+            type="text"
+            required
+            label="Conte-nos no que está pensando..."
+            onChange={this.handleInputChange}
+            value={this.state.postValue.text} 
+          />
+          <Button onClick={this.handleCreatePost} >Postar!</Button>
         </PostCard>
 
+
         {this.props.posts &&
-          this.props.posts.map((posts) => {
+          this.props.posts.map((post) => {
             return (
               <PostCard>
                 <PostHeader>
-                  <p>Usuário: {posts.username}</p>
+                  <p>Usuário: {post.username}</p>
                 </PostHeader>
 
                 <PostContent>
-                  <p>{posts.text}</p>
+                  <b>{post.title}</b>
+                  <p>{post.text}</p>
                 </PostContent>
 
                 <PostFooter>
+
                   <PostLikeIcons>
-                    <IconButton>
+                    <IconButton onClick={()=> this.handleVote(1, post.id, post.userVoteDirection)} >
                       <Icons>
-                        <MdThumbUp />
+                        <MdThumbUp color={post.userVoteDirection === 1 ? "red" : "#878a8c"}/>
                       </Icons>
                     </IconButton>
-                    <IconButton>
+                    {post.votesCount}
+                    <IconButton onClick={()=> this.handleVote(-1, post.id, post.userVoteDirection)} >
                       <Icons>
-                        <MdThumbDown />
+                        <MdThumbDown color={post.userVoteDirection === -1 ? "blue" : "#878a8c"}/>
                       </Icons>
                     </IconButton>
                   </PostLikeIcons>
@@ -233,7 +291,10 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = dispatch => ({
   goToPostDetails: () => dispatch(push(routes.postDetails)),
   goToLoginScreen: () => dispatch(replace(routes.root)),
-  getPosts: () => dispatch(getPosts())
+  getPosts: () => dispatch(getPosts()),
+  createPost: (body) => dispatch(createPost(body)),
+  votePost: (direction, id ) => dispatch(votePost(direction, id))
+
 })
 
 export default connect(

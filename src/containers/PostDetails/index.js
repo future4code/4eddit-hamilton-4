@@ -5,9 +5,12 @@ import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
 import { push, replace } from "connected-react-router";
 import { routes } from '../Router'
+//react icons início
 import { MdThumbDown, MdThumbUp } from 'react-icons/md';
 import { FaRegCommentDots, FaShare} from 'react-icons/fa';
 import { BsBookmarkFill, BsThreeDots } from 'react-icons/bs';
+import { GoSearch } from 'react-icons/go'
+
 import Imagem from '../../imgs/logoHeader.png'
 
 
@@ -102,6 +105,16 @@ const IconButton = styled.button `
 
 //////////////////////////////post card components
 
+////////////////////////////Search Box
+const FatherDiv = styled.div`
+  display: flex;
+  align-items: center;
+`
+const SearchIconDiv = styled.div`
+  margin-top: 25px;
+`
+
+////////////////////////////Search Box
 
 
 class PostDetails extends Component {
@@ -125,9 +138,15 @@ class PostDetails extends Component {
 
       <HeaderComp>
           <ImgLogo src={Imagem}/>
-          <TextField
-          label="Search"
-          />
+          <FatherDiv><TextField
+            style = {{width: 500}} 
+            label="Search"
+            
+            />
+            <SearchIconDiv>
+              <h2><GoSearch /></h2>
+            </SearchIconDiv>
+          </FatherDiv>
          {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
       </HeaderComp>
 
