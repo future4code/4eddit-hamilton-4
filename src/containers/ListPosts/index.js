@@ -10,6 +10,8 @@ import { MdThumbDown, MdThumbUp } from 'react-icons/md';
 import { FaRegCommentDots, FaShare } from 'react-icons/fa';
 import { BsBookmarkFill, BsThreeDots } from 'react-icons/bs';
 import { GoSearch } from 'react-icons/go'
+import LinearProgress from '@material-ui/core/LinearProgress';
+
 import Imagem from '../../imgs/logoHeader.png'
 import { getPosts, createPost, votePost, getPostDetails, getPostId } from '../../actions/posts'
 import { withStyles } from '@material-ui/core/styles';
@@ -27,6 +29,11 @@ const colors = keyframes` {
       background-position: 0% 50%;
   }
 }
+`
+
+const ContentWrapper = styled.div`
+  max-width: 960px;
+  margin: 0 auto;
 `
 
 const StyledButton = withStyles({
@@ -47,7 +54,7 @@ const StyledButton = withStyles({
 
 const Body = styled.div`
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   background: linear-gradient(90deg ,#c0c0aa ,#1cefff ) ;
   display: flex;
   flex-direction: column;
@@ -216,6 +223,7 @@ class ListPosts extends Component {
 
   render() {
     const isLogged = localStorage.getItem("token") !== null
+
     return (
       <Body>
         {/* Header do site */}
@@ -234,7 +242,8 @@ class ListPosts extends Component {
 
           {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
         </HeaderComp>
-
+        <ContentWrapper>
+          
         {/* Criação de um post */}
         <CreatePost>
           <TextField
@@ -258,7 +267,7 @@ class ListPosts extends Component {
           <br />
           <StyledButton variant="contained" color="secondary" onClick={this.handleCreatePost} >POSTAR</StyledButton>
         </CreatePost>
-
+        {this.props.posts.length === 0 && <LinearProgress color="secondary"/>}
         {/* Lista de post */}
         {this.props.posts &&
           this.props.posts.map((post) => {
@@ -283,7 +292,7 @@ class ListPosts extends Component {
                         <MdThumbUp color={post.userVoteDirection === 1 ? "red" : "#878a8c"} />
                       </Icons>
                     </IconButton>
-                    {post.votesCount}
+                   <b>{post.votesCount}</b> 
                     <IconButton onClick={() => this.handleVote(-1, post.id, post.userVoteDirection)} >
                       <Icons>
                         <MdThumbDown color={post.userVoteDirection === -1 ? "blue" : "#878a8c"} />
@@ -297,7 +306,7 @@ class ListPosts extends Component {
                       <FaRegCommentDots />
                     </Icons>
                   </IconButton>
-                  0
+                  <b>{post.commentsCount}</b>
 
                   {/* Icon compartilhar */}
                   <IconButton>
@@ -325,7 +334,7 @@ class ListPosts extends Component {
             )
           })
         }
-
+        </ContentWrapper>
       </Body>
     );
   }

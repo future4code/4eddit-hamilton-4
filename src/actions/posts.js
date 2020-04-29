@@ -78,7 +78,6 @@ export const votePost = (direction, id) => async (dispatch, getState) => {
       }
     }
     )
-    console.log(direction)
     dispatch(getPosts())
   } catch (error) {
     console.error()
@@ -86,19 +85,40 @@ export const votePost = (direction, id) => async (dispatch, getState) => {
 }
 
 export const getPostDetails = (postId) => async (dispatch, getState) => {
+  console.log(postId)
   const token = localStorage.getItem("token")
    try {
      const response = await axios.get(
        `https://us-central1-future-apis.cloudfunctions.net/fourEddit/posts/${postId}`, {
          headers: {
            auth: token
+           
          }
        } 
      )
-      console.log(response.data.post)
-     dispatch(setPostDetails(response.data.post))
+     dispatch(setPostDetails(response.data.post.comments))
    } catch (error){
      console.error()
    }
+}
+
+export const createComment = (text, postId) => async (dispatch, getState) => {
+  const token = localStorage.getItem("token")
+  const body = {
+    text
+  }
+  try {
+    const response = await axios.post(
+      `https://us-central1-future-apis.cloudfunctions.net/fourEddit/posts/${postId}/comment`, body, {
+      headers: {
+        auth: token
+      }
+    }
+    )
+    alert("Comentário criado com sucesso!")
+    dispatch(getPostDetails(postId))
+  } catch (error) {
+    console.error()
+  }
 }
 
