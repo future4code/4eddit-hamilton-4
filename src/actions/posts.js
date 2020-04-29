@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { routes } from '../containers/Router'
 
-const token = localStorage.getItem("token")
 
 //Funções síncronas
 export const setAllPosts = (post) => {
@@ -13,9 +12,28 @@ export const setAllPosts = (post) => {
   };
 };
 
+export const setPostDetails = (comments) => {
+  return {
+    type: "SET_POST_DETAILS",
+    payload: {
+      comments
+    }
+  }
+}
+
+export const getPostId = (id) => {
+  return {
+    type: "GET_POST_ID",
+    payload: {
+      id
+    }
+  }
+}
+
 //Funções assíncronas
 
 export const getPosts = () => async (dispatch, getState) => {
+  const token = localStorage.getItem("token")
   try {
     const response = await axios.get(
       'https://us-central1-future-apis.cloudfunctions.net/fourEddit/posts', {
@@ -31,7 +49,7 @@ export const getPosts = () => async (dispatch, getState) => {
 }
 
 export const createPost = (body) => async (dispatch, getState) => {
-
+  const token = localStorage.getItem("token")
   try {
     const response = await axios.post(
       'https://us-central1-future-apis.cloudfunctions.net/fourEddit/posts', body, {
@@ -48,6 +66,7 @@ export const createPost = (body) => async (dispatch, getState) => {
 }
 
 export const votePost = (direction, id) => async (dispatch, getState) => {
+  const token = localStorage.getItem("token")
   const body = {
     direction
   }
@@ -64,5 +83,22 @@ export const votePost = (direction, id) => async (dispatch, getState) => {
   } catch (error) {
     console.error()
   }
+}
+
+export const getPostDetails = (postId) => async (dispatch, getState) => {
+  const token = localStorage.getItem("token")
+   try {
+     const response = await axios.get(
+       `https://us-central1-future-apis.cloudfunctions.net/fourEddit/posts/${postId}`, {
+         headers: {
+           auth: token
+         }
+       } 
+     )
+      console.log(response.data.post)
+     dispatch(setPostDetails(response.data.post))
+   } catch (error){
+     console.error()
+   }
 }
 

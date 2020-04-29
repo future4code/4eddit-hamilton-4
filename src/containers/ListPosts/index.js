@@ -11,9 +11,8 @@ import { FaRegCommentDots, FaShare } from 'react-icons/fa';
 import { BsBookmarkFill, BsThreeDots } from 'react-icons/bs';
 import { GoSearch } from 'react-icons/go'
 import Imagem from '../../imgs/logoHeader.png'
-import { getPosts, createPost, votePost } from '../../actions/posts'
+import { getPosts, createPost, votePost, getPostDetails, getPostId } from '../../actions/posts'
 import { withStyles } from '@material-ui/core/styles';
-
 
 const colors = keyframes` {
   0% {
@@ -102,8 +101,6 @@ const PostContent = styled.div`
   padding:20px;
   margin: auto;
   text-align: center;
-
-  
 `
 
 //////////////////////post footer components
@@ -209,13 +206,16 @@ class ListPosts extends Component {
       this.props.votePost(direction, id)
     }
   }
-
+  
+  handlePostId = (id) => {
+    console.log(id)
+    this.props.goToPostDetails()
+    this.props.getPostId(id)
+  }
 
 
   render() {
     const isLogged = localStorage.getItem("token") !== null
-    const { goToPostDetails } = this.props
-    // console.log(this.props.posts)
     return (
       <Body>
         {/* Header do site */}
@@ -265,7 +265,6 @@ class ListPosts extends Component {
             return (
 
               <PostCard>
-
                 <PostHeader>
                   <H5>Posted by: <u>{post.username} 3 days ago</u></H5>
                 </PostHeader>
@@ -293,7 +292,7 @@ class ListPosts extends Component {
                   </PostLikeIcons>
 
                   {/* Seção comentário */}
-                  <IconButton onClick={goToPostDetails}>
+                  <IconButton onClick={() => this.handlePostId(post.id)}>
                     <Icons>
                       <FaRegCommentDots />
                     </Icons>
@@ -342,7 +341,9 @@ const mapDispatchToProps = dispatch => ({
   goToLoginScreen: () => dispatch(replace(routes.root)),
   getPosts: () => dispatch(getPosts()),
   createPost: (body) => dispatch(createPost(body)),
-  votePost: (direction, id) => dispatch(votePost(direction, id))
+  votePost: (direction, id) => dispatch(votePost(direction, id)),
+  getPostDetails: (postId) => dispatch(getPostDetails(postId)),
+  getPostId: (id) => dispatch(getPostId(id))
 
 })
 
