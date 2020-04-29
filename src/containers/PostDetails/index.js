@@ -5,11 +5,10 @@ import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
 import { push, replace } from "connected-react-router";
 import { routes } from '../Router'
-import { getPostDetails } from '../../actions/posts'
+import { getPostDetails, createComment } from '../../actions/posts'
 //react icons início
-import { MdThumbDown, MdThumbUp } from 'react-icons/md';
-import { FaRegCommentDots, FaShare } from 'react-icons/fa';
-import { BsBookmarkFill, BsThreeDots } from 'react-icons/bs';
+import LinearProgress from '@material-ui/core/LinearProgress';
+
 import { GoSearch } from 'react-icons/go'
 import Imagem from '../../imgs/logoHeader.png'
 
@@ -72,7 +71,7 @@ const PostCard = styled.div`
   background-color: white;
   border-radius: 5px;
 `
-const CreatePost = styled.div`
+const CommentCard = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -85,7 +84,6 @@ const CreatePost = styled.div`
   margin-bottom: 30px;
   background-color: white;
   border-radius: 5px;
-  padding: 30px;
 `
 
 //////////////////////post header components
@@ -159,11 +157,16 @@ class PostDetails extends Component {
 
   componentDidMount() {
     const token = localStorage.getItem("token")
+
     if (token === null) {
       this.props.goToLoginScreen()
     }
-    this.props.getPostDetails(this.props.postId, localStorage.getItem("token"))
 
+    if (this.props.postId === undefined) {
+      this.props.backToListPosts()
+    } else {
+      this.props.getPostDetails(this.props.postId, localStorage.getItem("token"))
+    }
   }
 
   handleLogout = () => {
@@ -171,13 +174,31 @@ class PostDetails extends Component {
     this.props.goToLoginScreen()
   }
 
+  handleCreateComment = (event) => {
+    // const token = localStorage.getItem("token")
+    // const { createComment }
+     event.preventDefault()
+     this.props.createComment(this.state.comment,  this.props.postInfo.id)
+     this.setState({
+       comment: ""
+     })
+  }
 
+  handleCommentChange = (event) => {
+    this.setState ({
+      comment: event.target.value
+    }) 
+  }
 
 
   render() {
-    const { goToListPosts } = this.props
     const isLogged = localStorage.getItem("token") !== null
-    const { posts } = this.props
+    const { postInfo, posts, goToListPosts, postId } = this.props
+    const currentPost = posts.find ((post) => post.id === postId)
+console.log(currentPost)
+if (currentPost === undefined){
+  return <div>carregando..</div>
+}
     return (
       <Body>
         {/* Header da página */}
@@ -195,9 +216,39 @@ class PostDetails extends Component {
           {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
         </HeaderComp>
 
+        <CommentCard>
+          <PostHeader>
+            <p>{currentPost.username}</p>
+          </PostHeader>
+          <PostContent>
+            <b>{currentPost.title}</b>
+          <p>{currentPost.text}</p>
+
+      </PostContent>
+
+          <TextField
+            name="username"
+            required
+            type="text"
+            label="Escreva aqui seu comentário"
+            style={{ width: 300 }}
+            value={this.state.comment}
+            onChange={this.handleCommentChange}
+          />
+          <Button onClick={this.handleCreateComment} variant="contained" color="primary" type="submit">Comentar</Button>
+
+        </CommentCard>
+
+        {/* <CreateComment>
+
+        </CreateComment> */}
+
+  
+
+
+{this.props.posts.length === 0 && <LinearProgress color="secondary"/>}
         {/* Detalhe do post */}
-        {this.props.postInfo &&
-          this.props.postInfo.map((post) => {
+        {postInfo.map((post) => {
             return (
             <PostCard>
               <PostHeader>
@@ -205,85 +256,15 @@ class PostDetails extends Component {
               </PostHeader>
 
               <PostContent>
-               <p>Post tittle</p> 
-               <p>Post text</p> 
+               <p>{post.tittle}</p> 
+               <p>{post.text}</p> 
               </PostContent>
 
-              {/* <PostFooter>
-                <PostLikeIcons>
-                  <IconButton>
-                      <Icons>
-                        <MdThumbUp/>
-                      </Icons>
-                  </IconButton>
-                  <IconButton>
-                      <Icons>
-                        <MdThumbDown/>
-                      </Icons>
-                  </IconButton>
-                </PostLikeIcons>
-        
-                  <IconButton>
-                    <Icons>
-                      <FaRegCommentDots/>
-                    </Icons>            
-                  </IconButton>
-                  <IconButton>
-                    <Icons>
-                      <FaShare/>
-                    </Icons>     
-                  </IconButton>
-                  <IconButton>
-                    <Icons>
-                      <BsBookmarkFill/>
-                    </Icons>
-                  </IconButton>
-                  <IconButton> 
-                    <Icons>
-                      <BsThreeDots/>
-                    </Icons>
-                  </IconButton>
-              </PostFooter> */}
+            
             </PostCard>)
           })
         }
-
-        <CreatePost>
-          <TextField
-            name="username"
-            type="text"
-            label="Escreva aqui seu comentário"
-          // onChange={this.handleInputChange}
-          // value={this.state.form.name || "" 
-          />
-          <Button /* aqui vai função pra enviar o comentário pra api */ type="submit">Comentar</Button>
-        </CreatePost>
-
-        <PostCard>
-          <PostHeader>
-            <p>Nome do Usuário</p>
-          </PostHeader>
-          <PostContent>
-            conteúdo do comentário
-      </PostContent>
-
-          <PostFooter>
-            <PostLikeIcons>
-              <IconButton>
-                <Icons>
-                  <MdThumbUp />
-                </Icons>
-              </IconButton>
-              <IconButton>
-                <Icons>
-                  <MdThumbDown />
-                </Icons>
-              </IconButton>
-            </PostLikeIcons>
-
-          </PostFooter>
-        </PostCard>
-
+        
       </Body>
     );
   }
@@ -292,13 +273,16 @@ class PostDetails extends Component {
 const mapStateToProps = (state) => ({
   postId: state.posts.postId,
   postInfo: state.posts.postInfo,
+  posts: state.posts.posts
 
 })
 
 const mapDispatchToProps = dispatch => ({
   goToLoginScreen: () => dispatch(replace(routes.root)),
   goToListPosts: () => dispatch(push(routes.listPosts)),
-  getPostDetails: (postId) => dispatch(getPostDetails(postId))
+  getPostDetails: (postId) => dispatch(getPostDetails(postId)),
+  backToListPosts: () => dispatch(replace(routes.listPosts)),
+  createComment: (text, postId) => dispatch(createComment(text, postId))
 })
 
 export default connect(

@@ -1,10 +1,11 @@
 const initialState = {
     posts: [],
     postInfo: [],
-    postId: ""
+    postId: undefined
 }
 
 const posts = (state = initialState, action) => {
+  console.log(action)
     switch (action.type) {
       case "SET_ALL_POSTS":{
         return {...state, posts: action.payload.post}
