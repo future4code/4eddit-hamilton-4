@@ -122,3 +122,23 @@ export const createComment = (text, postId) => async (dispatch, getState) => {
   }
 }
 
+export const voteComment = (postId, commentId, direction) => async (dispatch, getState) => {
+  const token = localStorage.getItem("token")
+  const body = {
+    direction
+  }
+  try {
+    const response = await axios.put(
+      `https://us-central1-future-apis.cloudfunctions.net/fourEddit/posts/${postId}/comment/${commentId}/vote`,
+      body, {
+        headers: {
+          auth: token
+        }
+      }
+    )
+    console.log(voteComment)
+    dispatch(getPostDetails(postId)) 
+  } catch (error) {
+    console.error()
+  }
+}

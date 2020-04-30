@@ -5,9 +5,10 @@ import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
 import { push, replace } from "connected-react-router";
 import { routes } from '../Router'
-import { getPostDetails, createComment } from '../../actions/posts'
+import { getPostDetails, createComment, voteComment } from '../../actions/posts'
 //react icons início
 import LinearProgress from '@material-ui/core/LinearProgress';
+import { MdThumbDown, MdThumbUp } from 'react-icons/md';
 
 import { GoSearch } from 'react-icons/go'
 import Imagem from '../../imgs/logoHeader.png'
@@ -62,7 +63,7 @@ const PostCard = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  min-width: 400px;
+  min-width: 500px;
   width: 30vw;
   height: fit-content;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
@@ -76,14 +77,14 @@ const CommentCard = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  min-width: 400px;
-  width: 30vw;
+  width: 400px;
   height: fit-content;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
   box-sizing: border-box;
   margin-bottom: 30px;
   background-color: white;
   border-radius: 5px;
+  
 `
 
 //////////////////////post header components
@@ -92,25 +93,38 @@ const PostHeader = styled.div`
   padding: 0px 10px 0px 10px;
   margin-bottom: 20px;
 `
+const CommentHeader = styled.div`
+  border-bottom: 2px solid #ed7f61;
+  padding: 0px 10px 0px 10px;
+`
 //////////////////////post header components
 
 //////////////////////post body components
 const PostContent = styled.div`
   height: fit-content;
   width: 60%;
-  padding:20px;
+  padding:15px;
   margin: auto;
   text-align: center;
 `
+const CommentContent = styled.div`
+  height: fit-content;
+  width: 90%;
+  padding:20px;
+  margin: auto;
+  text-align: center;
+  word-wrap: break-word;
+`
 //////////////////////post body components
-
+const H5 = styled.h5`
+color: #636e72;
+`
 //////////////////////post footer components
-const PostFooter = styled.div`
+const CommentFooter = styled.div`
   display: flex;
   justify-content: space-between;
-  border-top: 2px solid #878a8c;
+  border-top: 2px solid #ed7f61;
   padding: 6px 10px 3px 10px;
-  margin-top: 20px;
 `
 //////Thumbs Icons Div
 const PostLikeIcons = styled.div`
@@ -175,30 +189,36 @@ class PostDetails extends Component {
   }
 
   handleCreateComment = (event) => {
-    // const token = localStorage.getItem("token")
-    // const { createComment }
-     event.preventDefault()
-     this.props.createComment(this.state.comment,  this.props.postInfo.id)
-     this.setState({
-       comment: ""
-     })
+    event.preventDefault()
+    this.props.createComment(this.state.comment, this.props.postId)
+    this.setState({
+      comment: ""
+    })
   }
 
   handleCommentChange = (event) => {
-    this.setState ({
+    this.setState({
       comment: event.target.value
-    }) 
+    })
   }
+
+  handleCommentVote = (postId, commentId, direction, userVoteDirection) => {
+    if (direction === userVoteDirection) {
+      this.props.voteComment(0, commentId)
+    }else {
+      this.props.voteComment(direction, commentId)
+    }
+  } 
 
 
   render() {
     const isLogged = localStorage.getItem("token") !== null
-    const { postInfo, posts, goToListPosts, postId } = this.props
-    const currentPost = posts.find ((post) => post.id === postId)
-console.log(currentPost)
-if (currentPost === undefined){
-  return <div>carregando..</div>
-}
+    const { postComment, posts, goToListPosts, postId } = this.props
+    const currentPost = posts.find((post) => post.id === postId)
+    console.log(currentPost)
+    if (currentPost === undefined) {
+      return <div>carregando..</div>
+    }
     return (
       <Body>
         {/* Header da página */}
@@ -216,55 +236,64 @@ if (currentPost === undefined){
           {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
         </HeaderComp>
 
-        <CommentCard>
+        <PostCard>
           <PostHeader>
             <p>{currentPost.username}</p>
           </PostHeader>
           <PostContent>
             <b>{currentPost.title}</b>
-          <p>{currentPost.text}</p>
-
-      </PostContent>
+            <p>{currentPost.text}</p>
+          </PostContent>
 
           <TextField
-            name="username"
             required
+            variant="outlined"
             type="text"
             label="Escreva aqui seu comentário"
             style={{ width: 300 }}
             value={this.state.comment}
             onChange={this.handleCommentChange}
           />
+          <br/>
           <Button onClick={this.handleCreateComment} variant="contained" color="primary" type="submit">Comentar</Button>
+          <br/>
+        </PostCard>
 
-        </CommentCard>
-
-        {/* <CreateComment>
-
-        </CreateComment> */}
-
-  
-
-
-{this.props.posts.length === 0 && <LinearProgress color="secondary"/>}
+        {this.props.posts.length === 0 && <LinearProgress color="secondary" />}
         {/* Detalhe do post */}
-        {postInfo.map((post) => {
-            return (
-            <PostCard>
-              <PostHeader>
-                <p>nome do usário: {post.username}</p>
-              </PostHeader>
+        {postComment.map((post) => {
+          return (
+            <CommentCard>
+              <CommentHeader>
+              <H5>Commented by: <u>{post.username} 3 days ago</u></H5>
+              </CommentHeader>
 
-              <PostContent>
-               <p>{post.tittle}</p> 
-               <p>{post.text}</p> 
-              </PostContent>
+              <CommentContent>
+                <p>{post.tittle}</p>
+                <p>{post.text}</p>
+              </CommentContent>
 
-            
-            </PostCard>)
-          })
+              <CommentFooter>
+                {/* Icons like e dislike */}
+                <PostLikeIcons>
+                  <IconButton onClick={() => this.handleCommentVote(1, post.id, posts.userVoteDirection)}>
+                    <Icons>
+                      <MdThumbUp color={posts.userVoteDirection === 1 ? "red" : "#878a8c"} />
+                    </Icons>
+                  </IconButton>
+                  <b>{post.votesCounts}</b>
+                  <IconButton onClick={() => this.handleCommentVote(-1, posts.id, posts.userVoteDirection)} >
+                    <Icons>
+                      <MdThumbDown  color={posts.userVoteDirection === -1 ? "red" : "#878a8c"} />
+                    </Icons>
+                  </IconButton>
+                </PostLikeIcons>
+              </CommentFooter>
+
+            </CommentCard>)
+        })
         }
-        
+
       </Body>
     );
   }
@@ -272,9 +301,8 @@ if (currentPost === undefined){
 
 const mapStateToProps = (state) => ({
   postId: state.posts.postId,
-  postInfo: state.posts.postInfo,
-  posts: state.posts.posts
-
+  postComment: state.posts.postComment,
+  posts: state.posts.posts,
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -282,7 +310,8 @@ const mapDispatchToProps = dispatch => ({
   goToListPosts: () => dispatch(push(routes.listPosts)),
   getPostDetails: (postId) => dispatch(getPostDetails(postId)),
   backToListPosts: () => dispatch(replace(routes.listPosts)),
-  createComment: (text, postId) => dispatch(createComment(text, postId))
+  createComment: (text, postId) => dispatch(createComment(text, postId)),
+  voteComment: (postId, commentId, direction) => dispatch(voteComment(postId, commentId, direction))
 })
 
 export default connect(
