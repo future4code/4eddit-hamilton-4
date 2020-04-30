@@ -15,6 +15,11 @@ const HeaderComp = styled.div `
 const ImgLogo = styled.img `
   width: 120px;
 `
+const H2 = styled.h1 `
+color: white; 
+margin: auto;
+padding-right: 150px;
+`
 
 
 class Header extends Component {
@@ -22,6 +27,8 @@ class Header extends Component {
     return (
       <HeaderComp>
           <ImgLogo src={Imagem}/>
+          {this.props.showTitle && <H2>Página de cadastro</H2>}
+     
       </HeaderComp>
     );
   }

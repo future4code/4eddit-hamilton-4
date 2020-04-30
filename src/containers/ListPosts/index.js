@@ -16,6 +16,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Imagem from '../../imgs/logoHeader.png'
 import { getPosts, createPost, votePost, getPostDetails, getPostId } from '../../actions/posts'
 import { withStyles } from '@material-ui/core/styles';
+import { PostFooter, PostLikeIcons, Icons, IconButton } from '../../components/Icons'
 
 const colors = keyframes` {
   0% {
@@ -117,35 +118,6 @@ const PostContent = styled.div`
   margin: auto;
   text-align: center;
   word-wrap: break-word;
-`
-
-//////////////////////post footer components
-const PostFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  border-top: 2px solid  #ed7f61;
-  padding: 6px 10px 3px 10px;
-  margin-top: 20px;
-`
-//////Thumbs Icons Div
-const PostLikeIcons = styled.div`
-  display: flex;
-  
-`
-const Icons = styled.h2`
-  margin: 0px 10px 0px 10px;
-  color: #878a8c;
-
-`
-//////Icons Button
-const IconButton = styled.button`
-  background: transparent;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  padding: initial;
-  height: fit-content;
-  outline: none;
 `
 
 ///////////////////////////////Header

@@ -9,10 +9,12 @@ import { getPostDetails, createComment, voteComment } from '../../actions/posts'
 //react icons início
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { MdThumbDown, MdThumbUp } from 'react-icons/md';
+import { FaRegCommentDots, FaShare } from 'react-icons/fa';
+import { BsBookmarkFill, BsThreeDots } from 'react-icons/bs';
 
 import { GoSearch } from 'react-icons/go'
 import Imagem from '../../imgs/logoHeader.png'
-
+import { PostFooter, PostLikeIcons, Icons, IconButton } from '../../components/Icons'
 
 const colors = keyframes` {
   0% {
@@ -48,7 +50,7 @@ const ImgLogo = styled.img`
 
 const Body = styled.div`
   width: 100%;
-  height: 100%;
+  min-height: 100vh;
   background: linear-gradient(90deg ,#c0c0aa ,#1cefff ) ;
   display: flex;
   flex-direction: column;
@@ -119,36 +121,18 @@ const CommentContent = styled.div`
 const H5 = styled.h5`
 color: #636e72;
 `
-//////////////////////post footer components
 const CommentFooter = styled.div`
   display: flex;
   justify-content: space-between;
   border-top: 2px solid #ed7f61;
   padding: 6px 10px 3px 10px;
 `
-//////Thumbs Icons Div
-const PostLikeIcons = styled.div`
-  display: flex;
-  
-`
-const Icons = styled.h2`
-  margin: 0px 10px 0px 10px;
-  color: #878a8c;
-`
-//////Icons Button
-const IconButton = styled.button`
-  background: transparent;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  padding: initial;
-  height: fit-content;
-  outline: none;
-`
+
 //////////////////////post footer components
 
 //////////////////////////////post card components
 
+////////////////////////////////Header
 ////////////////////////////Search Box
 const FatherDiv = styled.div`
   display: flex;
@@ -157,9 +141,13 @@ const FatherDiv = styled.div`
 const SearchIconDiv = styled.div`
   margin-top: 25px;
 `
-
-////////////////////////////Search Box
-
+////////////////////////////Buttons
+const HeaderButtons = styled.div `
+  display: flex;
+`
+const ButtonHeadder = styled.div `
+  margin: 0px 5px 0px 5px;
+`
 
 class PostDetails extends Component {
   constructor(props) {
@@ -202,13 +190,13 @@ class PostDetails extends Component {
     })
   }
 
-  handleCommentVote = (postId, commentId, direction, userVoteDirection) => {
+  handleCommentVote = (commentId, direction, userVoteDirection) => {
     if (direction === userVoteDirection) {
-      this.props.voteComment(0, commentId)
-    }else {
-      this.props.voteComment(direction, commentId)
+      this.props.voteComment(this.props.postId, commentId, 0)
+    } else {
+      this.props.voteComment(this.props.postId, commentId, direction)
     }
-  } 
+  }
 
 
   render() {
@@ -232,19 +220,69 @@ class PostDetails extends Component {
               <h2><GoSearch /></h2>
             </SearchIconDiv>
           </FatherDiv>
-          <Button onClick={goToListPosts} variant="contained" color="secondary">Voltar</Button>
-          {isLogged && <Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button>}
+        
+         <HeaderButtons>
+           <ButtonHeadder>
+           <Button onClick={goToListPosts} variant="contained" color="primary">Voltar</Button></ButtonHeadder>
+          {isLogged && <ButtonHeadder><Button onClick={this.handleLogout} variant="contained" color="primary">Logout</Button></ButtonHeadder>}
+          </HeaderButtons> 
+
         </HeaderComp>
 
         <PostCard>
           <PostHeader>
-            <p>{currentPost.username}</p>
+            <p>Posted by:{currentPost.username}</p>
           </PostHeader>
           <PostContent>
             <b>{currentPost.title}</b>
             <p>{currentPost.text}</p>
           </PostContent>
+          <PostFooter>{/* Post Footer */}            
+            <PostLikeIcons>{/* Icons like e dislike */}
+              <IconButton >
+                <Icons>
+                  <MdThumbUp />
+                </Icons>
+              </IconButton>
+              <b>{currentPost.votesCount}</b>
+              <IconButton >
+                <Icons>
+                  <MdThumbDown/>
+                </Icons>
+              </IconButton>
+            </PostLikeIcons>
 
+            {/* Seção comentário */}
+            <IconButton>
+              <Icons>
+                <FaRegCommentDots />
+              </Icons>
+            </IconButton>
+            <b>{currentPost.commentsCount}</b>
+
+            {/* Icon compartilhar */}
+            <IconButton>
+              <Icons>
+                <FaShare />
+              </Icons>
+            </IconButton>
+
+            {/* Icon salvar */}
+            <IconButton>
+              <Icons>
+                <BsBookmarkFill />
+              </Icons>
+            </IconButton>
+
+            {/* Icon mais opções */}
+            <IconButton>
+              <Icons>
+                <BsThreeDots />
+              </Icons>
+            </IconButton>
+
+          </PostFooter>
+          
           <TextField
             required
             variant="outlined"
@@ -254,37 +292,37 @@ class PostDetails extends Component {
             value={this.state.comment}
             onChange={this.handleCommentChange}
           />
-          <br/>
+          <br />
           <Button onClick={this.handleCreateComment} variant="contained" color="primary" type="submit">Comentar</Button>
-          <br/>
+          <br />
         </PostCard>
 
         {this.props.posts.length === 0 && <LinearProgress color="secondary" />}
         {/* Detalhe do post */}
-        {postComment.map((post) => {
+        {postComment.map((comment) => {
           return (
             <CommentCard>
               <CommentHeader>
-              <H5>Commented by: <u>{post.username} 3 days ago</u></H5>
+                <H5>Commented by: <u>{comment.username} 3 days ago</u></H5>
               </CommentHeader>
 
               <CommentContent>
-                <p>{post.tittle}</p>
-                <p>{post.text}</p>
+                <p>{comment.tittle}</p>
+                <p>{comment.text}</p>
               </CommentContent>
 
               <CommentFooter>
                 {/* Icons like e dislike */}
                 <PostLikeIcons>
-                  <IconButton onClick={() => this.handleCommentVote(1, post.id, posts.userVoteDirection)}>
+                  <IconButton onClick={() => this.handleCommentVote(comment.id, 1, comment.userVoteDirection)}>
                     <Icons>
-                      <MdThumbUp color={posts.userVoteDirection === 1 ? "red" : "#878a8c"} />
+                      <MdThumbUp color={comment.userVoteDirection === 1 ? "red" : "#878a8c"} />
                     </Icons>
                   </IconButton>
-                  <b>{post.votesCounts}</b>
-                  <IconButton onClick={() => this.handleCommentVote(-1, posts.id, posts.userVoteDirection)} >
+                  <b>{comment.votesCount}</b>
+                  <IconButton onClick={() => this.handleCommentVote(comment.id, -1, comment.userVoteDirection)} >
                     <Icons>
-                      <MdThumbDown  color={posts.userVoteDirection === -1 ? "red" : "#878a8c"} />
+                      <MdThumbDown color={comment.userVoteDirection === -1 ? "blue" : "#878a8c"} />
                     </Icons>
                   </IconButton>
                 </PostLikeIcons>
