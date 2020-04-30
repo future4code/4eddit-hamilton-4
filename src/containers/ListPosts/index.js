@@ -11,10 +11,12 @@ import { FaRegCommentDots, FaShare } from 'react-icons/fa';
 import { BsBookmarkFill, BsThreeDots } from 'react-icons/bs';
 import { GoSearch } from 'react-icons/go'
 import LinearProgress from '@material-ui/core/LinearProgress';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import Imagem from '../../imgs/logoHeader.png'
 import { getPosts, createPost, votePost, getPostDetails, getPostId } from '../../actions/posts'
 import { withStyles } from '@material-ui/core/styles';
+import { PostFooter, PostLikeIcons, Icons, IconButton } from '../../components/Icons'
 
 const colors = keyframes` {
   0% {
@@ -63,14 +65,21 @@ const Body = styled.div`
   animation: ${colors} 13s ease infinite;
  
 `
+
+const ProgressDiv = styled.div `
+  display: flex;
+  justify-content: center;
+`
+
 //////////////////////////////post card components
 const PostCard = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  min-width: 400px;
-  width: 30vw;
+  width: 400px;
+  margin:auto;
+  
   height: fit-content;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
   box-sizing: border-box;
@@ -83,7 +92,7 @@ const CreatePost = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  min-width: 400px;
+  min-width: 500px;
   width: 30vw;
   height: fit-content;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
@@ -104,39 +113,11 @@ const PostHeader = styled.div`
 //////////////////////post body components
 const PostContent = styled.div`
   height: fit-content;
-  width: 60%;
+  width: 90%;
   padding:20px;
   margin: auto;
   text-align: center;
-`
-
-//////////////////////post footer components
-const PostFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  border-top: 2px solid  #ed7f61;
-  padding: 6px 10px 3px 10px;
-  margin-top: 20px;
-`
-//////Thumbs Icons Div
-const PostLikeIcons = styled.div`
-  display: flex;
-  
-`
-const Icons = styled.h2`
-  margin: 0px 10px 0px 10px;
-  color: #878a8c;
-
-`
-//////Icons Button
-const IconButton = styled.button`
-  background: transparent;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  padding: initial;
-  height: fit-content;
-  outline: none;
+  word-wrap: break-word;
 `
 
 ///////////////////////////////Header
@@ -267,7 +248,8 @@ class ListPosts extends Component {
           <br />
           <StyledButton variant="contained" color="secondary" onClick={this.handleCreatePost} >POSTAR</StyledButton>
         </CreatePost>
-        {this.props.posts.length === 0 && <LinearProgress color="secondary"/>}
+
+        <ProgressDiv>{this.props.posts.length === 0 && <CircularProgress color="secondary" />}</ProgressDiv>
         {/* Lista de post */}
         {this.props.posts &&
           this.props.posts.map((post) => {

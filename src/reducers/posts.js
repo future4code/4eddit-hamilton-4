@@ -1,6 +1,6 @@
 const initialState = {
     posts: [],
-    postInfo: [],
+    postComment: [],
     postId: undefined
 }
 
@@ -11,7 +11,7 @@ const posts = (state = initialState, action) => {
         return {...state, posts: action.payload.post}
       }
       case "SET_POST_DETAILS": {
-        return {...state, postInfo: action.payload.comments}
+        return {...state, postComment: action.payload.comments}
       }
       case "GET_POST_ID": {
         return {...state, postId: action.payload.id}

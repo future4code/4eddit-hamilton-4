@@ -1,42 +1,13 @@
 import React, { Component } from "react";
-import styled from 'styled-components'
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { connect } from "react-redux";
-import { push } from "connected-react-router";
-import { routes } from '../Router'
 import Header from '../../components/Header'
 import { createUser } from '../../actions/user'
+import {Body, ContainerLogin, Form} from './styled'
 
-const Body = styled.div `
-  width: 100vw;
-  height: 100vh;
-  background-color: #DAE0E6;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`
-const ContainerLogin = styled.div `
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  min-width: 500px;
-  width: fit-content;
-  border: 2px solid #878a8c;
-  height: fit-content;
-  padding: 20px;
-  box-sizing: border-box;
-  margin-bottom: 30px;
-  background-color: white;
-  border-radius: 5px;
-`
-const Form = styled.form `
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 
-`
+
 
 class FormRegister extends Component {
   constructor(props){
@@ -63,7 +34,7 @@ class FormRegister extends Component {
 
     return (
       <Body>
-        <Header/>
+        <Header showTitle></Header> 
         <ContainerLogin>
           <Form onSubmit={this.handleSubmmit}>
         <TextField
@@ -91,8 +62,8 @@ class FormRegister extends Component {
           type="password"
           label="Senha"            
           value={password}
-          />
-          <Button type="submit">Cadastrar</Button>        
+          /><br/>
+          <Button type="submit" variant="contained" color="primary">Cadastrar</Button>        
         </Form>
 
         </ContainerLogin>

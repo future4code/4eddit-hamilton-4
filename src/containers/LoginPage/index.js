@@ -24,7 +24,7 @@ const ContainerLogin = styled.div `
   flex-direction: column;
   min-width: 400px;
   width: fit-content;
-  border: 2px solid #878a8c;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 10px 50px;
   height: fit-content;
   padding: 20px;
   box-sizing: border-box;
